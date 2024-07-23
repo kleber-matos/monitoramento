@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API Health Monitor</title>
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h1 class="text-center">API Health Monitor</h1>
+      <div class="text-center mb-4">
+        <button id="refreshButton" class="btn btn-primary">Refresh</button>
+      </div>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th scope="col">Application</th>
+            <th scope="col">Endpoint</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody id="statusTableBody"></tbody>
+      </table>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+      const applications = [
+        { name: "App 1", url: "http://localhost:8081/health" },
+        {
+          name: "App 2",
+          url: "https://6698e29c2069c438cd707bc1.mockapi.io/api/health/status",
+        },
+      ];
+
+      function createTableRows() {
+        applications.forEach((app, index) => {
+          $("#statusTableBody").append(
+            `<tr>
+            <td>${app.name}</td>
+            <td>${app.url}</td>
+            <td id="app${index + 1}Status">Loading...</td>
+          </tr>`
+          );
+        });
+      }
+
+      function checkHealth() {
+        applications.forEach((app, index) => {
+          $.get(app.url, function (data) {
+            $(`#app${index + 1}Status`).text("OK");
+          }).fail(function () {
+            $(`#app${index + 1}Status`).text("Error");
+          });
+        });
+      }
+
+      $(document).ready(function () {
+        createTableRows();
+        $("#refreshButton").click(function () {
+          checkHealth();
+        });
+        checkHealth();
+      });
+    </script>
+  </body>
+</html>
